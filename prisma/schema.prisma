@@ -1,0 +1,268 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts       Account[]
+  sessions       Session[]
+  wardrobeItems  WardrobeItem[]
+  outfits        Outfit[]
+  calendarEvents CalendarEvent[]
+  moodLogs       MoodLog[]
+  insights       Insight[]
+  savedOutfits   SavedOutfit[]
+  communityPosts CommunityPost[]
+  postLikes      PostLike[]
+  feedbacks      Feedback[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model WardrobeItem {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  category    String // e.g., "top", "bottom", "dress", "shoes", "accessories"
+  color       String?
+  brand       String?
+  imageUrl    String
+  tags        String[] // e.g., ["casual", "formal", "summer"]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfitItems OutfitItem[]
+
+  @@index([userId])
+  @@index([category])
+}
+
+model Outfit {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  imageUrl    String?
+  type        String   @default("wardrobe") // "wardrobe" or "photo"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items          OutfitItem[]
+  calendarEvents CalendarEvent[]
+  moodLogs       MoodLog[]
+  communityPosts CommunityPost[]
+
+  @@index([userId])
+  @@index([type])
+}
+
+model OutfitItem {
+  id             String @id @default(cuid())
+  outfitId       String
+  wardrobeItemId String
+  order          Int    @default(0)
+
+  outfit       Outfit       @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+  wardrobeItem WardrobeItem @relation(fields: [wardrobeItemId], references: [id], onDelete: Cascade)
+
+  @@unique([outfitId, wardrobeItemId])
+  @@index([outfitId])
+}
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  userId      String
+  outfitId    String?
+  date        DateTime
+  title       String
+  description String?
+  imageUrl    String?
+  eventType   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfit Outfit? @relation(fields: [outfitId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+}
+
+model MoodLog {
+  id         String   @id @default(cuid())
+  userId     String
+  outfitId   String?
+  date       DateTime
+  mood       String // e.g., "confident", "comfortable", "powerful", "creative"
+  energy     Int      @default(5) // 1-10 scale
+  confidence Int      @default(5) // 1-10 scale
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfit Outfit? @relation(fields: [outfitId], references: [id], onDelete: SetNull)
+
+  @@index([userId, date])
+  @@index([mood])
+}
+
+model Insight {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String // e.g., "mood_pattern", "color_impact", "category_preference"
+  title       String
+  description String
+  data        Json? // Flexible JSON for insight-specific data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+  @@index([userId])
+}
+
+model SavedOutfit {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  imageUrl    String
+  storeName   String?
+  storeUrl    String?
+  price       String?
+  brand       String?
+  category    String? // e.g., "casual", "formal", "streetwear"
+  tags        String[] // e.g., ["summer", "work", "date"]
+  isFavorite  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isFavorite])
+  @@index([category])
+}
+
+model CommunityPost {
+  id          String   @id @default(cuid())
+  userId      String
+  title       String
+  description String?
+  imageUrl    String
+  outfitId    String? // Optional link to user's outfit
+  mood        String? // How this outfit made them feel
+  tags        String[] // e.g., ["casual", "summer", "work"]
+  category    String? // e.g., "casual", "formal", "streetwear"
+  isPublic    Boolean  @default(true)
+  likesCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  outfit Outfit?    @relation(fields: [outfitId], references: [id], onDelete: SetNull)
+  likes  PostLike[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model PostLike {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+
+  user User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+}
+
+model Feedback {
+  id                  String   @id @default(cuid())
+  userId              String
+  type                String // e.g., "bug", "feature", "improvement", "general"
+  title               String
+  message             String
+  page                String? // Which page the feedback is about
+  rating              Int? // Optional overall rating 1-5
+  priority            String? // "low", "medium", "high", "critical"
+  featureArea         String? // e.g., "wardrobe", "outfits", "calendar", "mood", "insights", "community"
+  frequencyOfUse      String? // "daily", "weekly", "monthly", "rarely"
+  easeOfUse           Int? // 1-5 rating
+  designRating        Int? // 1-5 rating
+  functionalityRating Int? // 1-5 rating
+  painPoints          String?  @db.Text // What's frustrating
+  whatTheyLove        String?  @db.Text // What they love about the app
+  stepsToReproduce    String?  @db.Text // For bugs
+  browserInfo         String? // Browser and version
+  deviceInfo          String? // Device type and OS
+  additionalContext   String?  @db.Text // Any additional context
+  status              String   @default("pending") // "pending", "reviewed", "resolved"
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([priority])
+  @@index([featureArea])
+}
