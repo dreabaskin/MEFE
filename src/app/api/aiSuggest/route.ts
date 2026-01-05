@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { getOutfitSuggestion } from '@/lib/ai-suggestions'
 
+// Explicitly set Node.js runtime (not Edge)
+export const runtime = 'nodejs'
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth()
