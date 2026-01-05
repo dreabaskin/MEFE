@@ -1,15 +1,15 @@
 import OpenAI from 'openai'
 import { prisma } from './prisma'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function getOutfitSuggestion(
   userId: string,
   desiredMood: string,
   occasion?: string
 ): Promise<string> {
+  // Initialize OpenAI client inside the function to avoid build-time evaluation
+  const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
   // Get user's wardrobe items
   const wardrobeItems = await prisma.wardrobeItem.findMany({
     where: { userId },
