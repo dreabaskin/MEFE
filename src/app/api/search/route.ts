@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
+export const dynamic = "force-dynamic"
+
 // This is a placeholder search implementation
 // In production, you would integrate with actual shopping APIs, fashion APIs, or web scraping
 export async function POST(request: NextRequest) {

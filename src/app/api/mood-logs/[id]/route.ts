@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { generateInsights } from '@/lib/insights'
 
+export const dynamic = "force-dynamic"
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }

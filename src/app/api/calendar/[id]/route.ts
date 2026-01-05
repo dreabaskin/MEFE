@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { uploadImage } from '@/lib/cloudinary'
 
+export const dynamic = "force-dynamic"
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
