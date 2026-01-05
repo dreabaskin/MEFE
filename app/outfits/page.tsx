@@ -239,7 +239,7 @@ export default function OutfitsPage() {
     }
     setAiLoading(true)
     try {
-      const res = await fetch('/api/ai-suggest', {
+      const res = await fetch('/api/aiSuggest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ desiredMood: aiMood }),
