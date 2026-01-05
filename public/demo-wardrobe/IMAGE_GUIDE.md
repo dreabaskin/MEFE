@@ -36,3 +36,5 @@ Please add the following images to the `/public/demo-wardrobe/` directory:
 Note: If images are not found, the demo will show broken image placeholders. Make sure all filenames match exactly (case-sensitive).
 
 
+
+

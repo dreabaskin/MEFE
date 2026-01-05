@@ -31,7 +31,7 @@ export function Footer() {
                 <Twitter className="h-5 w-5" />
               </a>
               <a 
-                href="https://instagram.com/yourusername" 
+                href="https://www.instagram.com/_mefe__/?utm_source=qr" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-pink-500 transition-colors"
