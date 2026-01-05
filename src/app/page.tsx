@@ -9,6 +9,8 @@ import { Footer } from '@/components/footer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { SmoothScrollButton } from '@/components/smooth-scroll-button'
 
+export const dynamic = "force-dynamic"
+
 export default async function Home() {
   const session = await getServerSession(authOptions)
 

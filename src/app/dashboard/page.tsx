@@ -16,6 +16,8 @@ import { Shirt, Sparkles, Calendar, Heart, TrendingUp, Plus, Clock, ArrowRight, 
 import { format, isToday, parseISO } from 'date-fns'
 import Image from 'next/image'
 
+export const dynamic = "force-dynamic"
+
 export default async function Dashboard() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {

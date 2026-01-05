@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = "force-dynamic"
+
 // This endpoint helps find your data even if it's associated with a different user ID
 export async function GET(request: NextRequest) {
   try {
