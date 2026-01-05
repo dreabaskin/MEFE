@@ -1,5 +1,7 @@
-import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 
-export const auth = () => getServerSession(authOptions)
+export async function auth() {
+  return await getServerSession(authOptions)
+}
 
