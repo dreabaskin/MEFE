@@ -8,11 +8,16 @@ import { Heart, Calendar, Shirt, Sparkles, TrendingUp, Palette, ArrowRight, Chec
 import { Footer } from '@/components/footer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { SmoothScrollButton } from '@/components/smooth-scroll-button'
-
 export const dynamic = "force-dynamic"
 
 export default async function Home() {
-  const session = await getServerSession(authOptions)
+  let session = null
+
+  try {
+    session = await getServerSession(authOptions)
+  } catch (error) {
+    console.error("Session error:", error)
+  }
 
   if (session) {
     redirect('/dashboard')
